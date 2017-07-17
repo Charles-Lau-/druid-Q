@@ -3,11 +3,11 @@
 var Druid = require('./druid'),
     utils = require('./lib/utils'),
     queries = utils.moduleMap(__dirname + '/lib/query'),
-    lodash = require('lodash')
+    each = require('lodash/each')
 
 module.exports = Druid
 
-lodash.each(queries, (query) =>{
+each(queries, (query) =>{
     Druid[query.name] =  query
 })
 
