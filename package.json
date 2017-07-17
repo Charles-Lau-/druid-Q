@@ -1,0 +1,11 @@
+{
+  "name": "druid-query",
+  "version": "0.1.0",
+  "description": "to provide better experience as a druid query client",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Ken.Liu",
+  "license": "ISC"
+}
