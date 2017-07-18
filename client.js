@@ -21,10 +21,14 @@ function Client(url){
      this.queryLoop = {};
 }
 
-Client.prototype.exec =  (query) => {
-      this.request.post(query.toJSON(), (err, data) => {
-          console.log(err);
-          console.log(data);
+Client.prototype.exec =  function (query, callback) {
+      this.request.post(query.toJSON(), (err, data, body) => {
+            if(err) {
+                    callback(err)
+            }
+            else{
+                    callback(null, query.parseRes(body))
+            }
       })
 }
 

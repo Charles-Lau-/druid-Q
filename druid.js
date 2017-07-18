@@ -23,7 +23,6 @@ function Druid(brokerAddr){
      this.ready = false;
      var self = this
      this.on('ready', function (){
-           console.log(self.ready)
            self.ready = true
            debug("client has successfully connected to druid cluster");
      });
