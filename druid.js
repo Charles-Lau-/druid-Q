@@ -24,12 +24,13 @@ function Druid(brokerAddr){
      var self = this
      this.on('ready', function (){
            self.ready = true
-           debug("client has successfully connected to druid cluster");
+           debug('client has successfully connected to druid cluster');
      });
      this.on('error', function (){
-           debug("the broker address maybe not correct, client can not connect to the druid cluster");
+           debug('the broker address maybe incorrect, client can not connect to the druid cluster');
            throw new DruidError('can not connect to druid cluster');
      });
+     debug('send request to druid cluster to test whether it is connectable')
      request.get(this.brokerAddr+'/status', function (err){
            if(!err)
                self.emit('ready')
@@ -42,6 +43,7 @@ function Druid(brokerAddr){
 util.inherits(Druid, EventEmitter)
 
 Druid.prototype.client = function (){
+    debug('new a client instance')
     return new Client(this.brokerAddr)
 }
 
