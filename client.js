@@ -22,6 +22,7 @@ function Client(url){
 }
 
 Client.prototype.exec =  function (query, callback) {
+      query.validate()
       this.request.post(query.toJSON(), (err, data, body) => {
             if(err) {
                     callback(err)

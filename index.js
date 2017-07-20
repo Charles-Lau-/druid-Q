@@ -6,14 +6,21 @@ var Druid = require('./druid'),
     aggregators = utils.moduleMap(__dirname + '/lib/aggregator'),
     filters = utils.moduleMap(__dirname + '/lib/filter'),
     posts = utils.moduleMap(__dirname + '/lib/post'),
-    having = utils.moduleMap(__dirname + '/lib/having'),
+    havings = utils.moduleMap(__dirname + '/lib/having'),
     each = require('lodash/each')
 
-module.exports = Druid
 
 each(queries, (query) =>{
     Druid[query.name] =  (ds) => new query(ds)
 })
+
+
+exports.Druid = Druid
+exports.Aggregators = aggregators
+exports.Filters = filters
+exports.Post = posts
+exports.Havings = havings
+
 
 
 
