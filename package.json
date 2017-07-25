@@ -1,5 +1,5 @@
 {
-  "name": "druid-query",
+  "name": "query-druid",
   "version": "0.1.0",
   "description": "to provide better experience as a druid query client",
   "main": "index.js",
