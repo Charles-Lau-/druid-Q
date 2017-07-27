@@ -18,6 +18,7 @@ each(queries, (query) =>{
 exports.Druid = Druid
 exports.Aggregators = aggregators
 exports.Filters = filters
+exports.Queries = queries
 exports.Post = posts
 exports.Havings = havings
 

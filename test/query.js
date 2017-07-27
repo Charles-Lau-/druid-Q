@@ -8,7 +8,7 @@ describe("Specific Query Tests# ", function (){
     var client  = new druid('http://cloud-host-07:8082').client()
     describe("timeseries#", function (){
         this.timeout(15000);
-        var query = druid.TimeSeriesQuery('POPP').interval("2017-06-02T00:00:00.000","2017-06-03T00:00:00.000")
+        var query = druid.TimeSeriesQuery('POPP').intervals("2017-06-02T00:00:00.000","2017-06-03T00:00:00.000")
                      .filter('selector', 'verb', 'user.login')
                      .aggregator('count')
         it("test a simple normal query", function (done){
@@ -65,7 +65,7 @@ describe("Specific Query Tests# ", function (){
     })
     describe("topN#", function () {
         this.timeout(15000);
-        var query = druid.TopNQuery('POPP').interval("2017-06-02T00:00:00.000", "2017-06-03T00:00:00.000")
+        var query = druid.TopNQuery('POPP').intervals("2017-06-02T00:00:00.000", "2017-06-03T00:00:00.000")
                 .filter('selector', 'verb', 'user.login')
                 .dimension('gender')
                 .aggregator('count')
@@ -86,7 +86,7 @@ describe("Specific Query Tests# ", function (){
         })
         it('throw errors when there are missing field', function (){
              expect(function (){
-                 var q = druid.TopNQuery('POPP').interval("2017-06-02T00:00:00.000", "2017-06-03T00:00:00.000")
+                 var q = druid.TopNQuery('POPP').intervals("2017-06-02T00:00:00.000", "2017-06-03T00:00:00.000")
                      .filter('selector', 'verb', 'user.login')
                      .dimension('gender')
                  client.exec(q)
@@ -95,7 +95,7 @@ describe("Specific Query Tests# ", function (){
     })
     describe("groupBy#", function (){
         this.timeout(15000)
-        var query =  druid.GroupByQuery('POPP').interval("2017-06-02T00:00:00.000", "2017-06-03T00:00:00.000")
+        var query =  druid.GroupByQuery('POPP').intervals("2017-06-02T00:00:00.000", "2017-06-03T00:00:00.000")
             .filter('selector', 'verb', 'user.login')
             .aggregator('count')
 
