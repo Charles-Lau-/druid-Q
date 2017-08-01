@@ -45,6 +45,46 @@ Client.prototype.exec =  function (query, callback) {
     }
 }
 
+Client.prototype.execBatchInterval = function (query, intervals , callback){
+     let counter = 0
+     let res = {}
+     let self = this
+     intervals.forEach(function (interval, index){
+         self.exec(query.clone().intervals(interval), function (err , data){
+             counter ++
+             if(err){
+                 callback(err)
+             }
+             else {
+                 res[index] = data
+             }
+             if(intervals.length === counter)
+                 callback(null, res)
+         })
+     })
+}
+
+Client.prototype.execBatchQueries = function (queries, callback){
+    let counter = 0
+    let res = {}
+    let self = this
+    queries.forEach(function (query, index){
+        self.exec(query, function (err , data){
+            counter++
+            if(err){
+                callback(err)
+            }
+            else {
+                res[index] = data
+            }
+            if(queries.length === counter)
+                callback(null, res)
+        })
+    })
+}
+
+
+
 
 
 
