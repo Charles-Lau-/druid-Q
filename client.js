@@ -4,7 +4,8 @@
 "use strict";
 
 var debug = require('debug')('druid-query:client'),
-    Sender = require('./lib/sender')
+    Sender = require('./lib/sender'),
+    each = require('lodash/each')
 
 
 module.exports = Client;
@@ -47,9 +48,18 @@ Client.prototype.exec =  function (query, callback) {
 
 Client.prototype.execBatchInterval = function (query, intervals , callback){
      let counter = 0
-     let res = {}
+     let res
+     let length
+     if(Array.isArray(intervals)){
+         res = new Array(intervals.length)
+         length =  res.length
+     }
+     else{
+         res = {}
+         length = Object.keys(intervals).length
+     }
      let self = this
-     intervals.forEach(function (interval, index){
+     each(intervals, function (interval, index){
          self.exec(query.clone().intervals(interval), function (err , data){
              counter ++
              if(err){
@@ -58,7 +68,7 @@ Client.prototype.execBatchInterval = function (query, intervals , callback){
              else {
                  res[index] = data
              }
-             if(intervals.length === counter)
+             if(length === counter)
                  callback(null, res)
          })
      })
@@ -66,9 +76,18 @@ Client.prototype.execBatchInterval = function (query, intervals , callback){
 
 Client.prototype.execBatchQueries = function (queries, callback){
     let counter = 0
-    let res = {}
+    let res
+    let length
+    if(Array.isArray(queries)){
+        res = new Array(queries.length)
+        length = res.length
+    }
+    else{
+        res = {}
+        length = Object.keys(queries).length
+    }
     let self = this
-    queries.forEach(function (query, index){
+    each(queries, function (query, index){
         self.exec(query, function (err , data){
             counter++
             if(err){
@@ -77,7 +96,7 @@ Client.prototype.execBatchQueries = function (queries, callback){
             else {
                 res[index] = data
             }
-            if(queries.length === counter)
+            if(length === counter)
                 callback(null, res)
         })
     })
