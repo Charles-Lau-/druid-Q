@@ -20,6 +20,10 @@ each(Object.keys(aggregators.aggregator.aggregators), (key) =>{
     aggregators[key] = aggregators.aggregator.aggregators[key]
 })
 
+each(Object.keys(posts.postAggregator.postAggregators), (key) =>{
+    posts[key] = posts.postAggregator.postAggregators[key]
+})
+
 delete aggregators.aggregator
 
 exports.Druid = Druid
