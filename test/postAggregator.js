@@ -118,8 +118,42 @@ describe('PostAggregator#', function (){
               good.validate()
            }).to.not.throw()
         })
+        it('thetaSketchSetOp postAggregator Validaiton', function (){
+            var bad =  createPosts('thetaSketchSetOp')
+            var bad2  = createPosts('thetaSketchSetOp', 'outputName','a')
+            var bad3 = createPosts('thetaSketchSetOp','outputName','UNION', ['a'])
+            var bad4 = createPosts('thetaSketchSetOp', 'outputName', 'UNION', [createPosts('fieldAccess','a','')])
+            var good = createPosts('thetaSketchSetOp', 'outputName', 'UNION', [createPosts('fieldAccess','a','b')])
+            expect(function (){
+                bad.validate()
+            }).to.throw(/missing/)
+            expect(function (){
+               bad2.validate()
+            }).to.throw(/UNION/)
+            expect(function (){
+               bad3.validate()
+            }).to.throw(/type/)
+            expect(function (){
+               bad4.validate()
+            }).to.throw(/empty/)
+            expect(function (){
+               good.validate()
+            }).to.not.throw()
+        })
         it('thetaSketchEstimate postAggregator Validation', function (){
-           var bad = createPosts()
+           var bad = createPosts('thetaSketchEstimate')
+           var bad2 = createPosts('thetaSketchEstimate', 'outputName')
+           var good = createPosts('thetaSketchEstimate', 'ouptputName',
+               createPosts('thetaSketchSetOp', 'outputName', 'UNION', [createPosts('fieldAccess','a','b')]))
+           expect(function (){
+              bad.validate()
+           }).to.throw(/missing/)
+           expect(function (){
+              bad2.validate()
+           }).to.throw(/missing/)
+           expect(function (){
+              good.validate()
+           }).to.not.throw()
         })
     })
 })
