@@ -75,7 +75,7 @@ describe('Aggregator#', function (){
            var bad3 = createAggregator('filtered', createFilter('selector'), createAggregator('count'))
            var bad4 = createAggregator('filtered', createFilter('selector', 'name', 'value'), createAggregator('thetaSketch'))
 
-           var good = createAggregator('filtered', createFilter('selector', 'name', 'value'), createAggregator('count'))
+           var good = createAggregator('filtered').withF('selector', 'name', 'value').withG('count')
            expect(function (){
               bad1.validate()
            }).to.throw(/missing/)
