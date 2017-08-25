@@ -81,20 +81,12 @@ describe('Filter#',function (){
 
         it('Bound Validation', function (){
             var badZero =  createFilter('bound')
-            var badOne = createFilter('bound','dimension','asdf','asdf')
-            var badTwo =  createFilter('bound','dimension','123','234')
             var badThree = createFilter('bound','dimension','1500886453','1500886453', true, false, 'asdf')
             var badFour =  createFilter('bound', 'dimension','1500886453', '1500886453', 'asdf','asdf')
             var good = createFilter('bound','dimension','1500886453','1500886453')
             expect(function (){
                 badZero.validate()
             }).to.throw(/missing/)
-            expect(function (){
-                badOne.validate()
-            }).to.throw(/timestamp/)
-            expect(function (){
-                badTwo.validate()
-            }).to.throw(/timestamp/)
             expect(function (){
                 badThree.validate()
             }).to.throw()
