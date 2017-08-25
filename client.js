@@ -15,12 +15,10 @@ function Client(url, druid){
      this.url = url;
      this.request = new Sender(url+"/druid/v2/?pretty")
      this.druid = druid
-     this.response = {};
-     this.queryLoop = {};
 }
 
 
-Client.prototype.exec =  function (query, callback) {
+Client.prototype.exec =  function (query, callback, cache=false) {
     if(this.druid.ready == true) {
         var realQuery = query.toJSON()
         if (debug.enabled) {
@@ -29,24 +27,78 @@ Client.prototype.exec =  function (query, callback) {
             debug('after validation of query')
         }
         debug('query %s is sent', JSON.stringify(realQuery))
-        this.request.post(realQuery, (err, data, body) => {
-            if (err) {
-                callback(err)
-                debug('error %s happens when send Query %s', err, JSON.stringify(realQuery))
+        if(cache) {
+            let queries = query.split()
+            let histor = queries[0]
+            let realtime = queries[1]
+            let self = this
+            if (histor) {
+                cache.get(JSON.stringify(histor.toJSON()), function (err, ca) {
+                    if (ca) {
+                        debug('get result ' + ca + ' from cache for query ' + JSON.stringify(histor.toJSON()))
+                        if (realtime)
+                            self.exec(realtime, function (err, data) {
+                                if (data) {
+                                    callback(null, query.merge(JSON.parse(ca), data))
+                                }
+                                else {
+                                    callback(err)
+                                }
+                            })
+                        else
+                            callback(null, JSON.parse(ca))
+                    }
+                    else {
+                        debug('no cache found for query' + JSON.stringify(histor.toJSON()))
+                        if (realtime) {
+                            self.execBatchQueries([histor, realtime], function (err, data) {
+                                if (data) {
+                                    callback(null, query.merge(data[0], data[1]))
+                                    cache.set(JSON.stringify(histor.toJSON()), JSON.stringify(data[0]))
+                                }
+                                else {
+                                    callback(err)
+                                }
+                            })
+                        }
+                        else {
+                            self.exec(histor, function (err, data) {
+                                if (data) {
+                                    callback(null, data)
+                                    cache.set(JSON.stringify(histor.toJSON()), JSON.stringify(data))
+                                    debug('set cache for query '+ JSON.stringify(histor.toJSON()))
+                                }
+                                else {
+                                    callback(err)
+                                }
+                            })
+                        }
+                    }
+                })
             }
-            else {
-                callback(null, query.parseRes(body))
-                debug('query %s has been completed', JSON.stringify(realQuery))
+        }
+        else{
+                this.request.post(realQuery, (err, data, body) => {
+                    if (err) {
+                        callback(err)
+                        debug('error %s happens when send Query %s', err, JSON.stringify(realQuery))
+                    }
+                    else {
+                        callback(null, query.parseRes(body))
+                        debug('query %s has been completed', JSON.stringify(realQuery))
+                    }
+                })
             }
-        })
+
     }
+
     else{
         var self = this
         this.druid.reload(function (){self.exec(query, callback)})
     }
 }
 
-Client.prototype.execBatchInterval = function (query, intervals , callback){
+Client.prototype.execBatchInterval = function (query, intervals , callback, cache=false){
      let counter = 0
      let res
      let length
@@ -70,11 +122,11 @@ Client.prototype.execBatchInterval = function (query, intervals , callback){
              }
              if(length === counter)
                  callback(null, res)
-         })
+         }, cache)
      })
 }
 
-Client.prototype.execBatchQueries = function (queries, callback){
+Client.prototype.execBatchQueries = function (queries, callback, cache=false){
     let counter = 0
     let res
     let length
@@ -99,7 +151,7 @@ Client.prototype.execBatchQueries = function (queries, callback){
             if(length === counter)
                 callback(null, res)
         })
-    })
+    }, cache)
 }
 
 
