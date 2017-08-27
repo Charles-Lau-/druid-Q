@@ -31,6 +31,7 @@ Client.prototype.exec =  function (query, callback, cache=false) {
             let queries = query.split()
             let histor = queries[0]
             let realtime = queries[1]
+            let counter = 0
             let self = this
             if (histor) {
                 cache.get(JSON.stringify(histor.toJSON()), function (err, ca) {
@@ -73,6 +74,18 @@ Client.prototype.exec =  function (query, callback, cache=false) {
                                 }
                             })
                         }
+                    }
+                })
+            }
+            else{
+                this.request.post(realQuery, (err, data, body) => {
+                    if (err) {
+                        callback(err)
+                        debug('error %s happens when send Query %s', err, JSON.stringify(realQuery))
+                    }
+                    else {
+                        callback(null, query.parseRes(body))
+                        debug('query %s has been completed', JSON.stringify(realQuery))
                     }
                 })
             }
@@ -150,8 +163,8 @@ Client.prototype.execBatchQueries = function (queries, callback, cache=false){
             }
             if(length === counter)
                 callback(null, res)
-        })
-    }, cache)
+        }, cache)
+    })
 }
 
 
