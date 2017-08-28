@@ -35,39 +35,59 @@ Client.prototype.exec =  function (query, callback, cache=false) {
             let queries = query.split()
             let histor = queries[0]
             let realtime = queries[1]
+            let realRes
+            let hisRes
             let counter = 0
             let self = this
             if (histor) {
-                this.cs.get(JSON.stringify(histor.toJSON()), function (err, ca) {
-                    if (ca) {
-                        debug('get result ' + ca + ' from cache for query ' + JSON.stringify(histor.toJSON()))
-                        if (realtime)
-                            self.exec(realtime, function (err, data) {
-                                if (data) {
-                                    callback(null, query.merge(JSON.parse(ca), data))
-                                }
-                                else {
-                                    callback(err)
-                                }
-                            })
-                        else
+                if(realtime){
+                    self.exec(realtime, function (err, data) {
+                            counter += 1
+                            if (data) {
+                                if(counter == 2)
+                                    callback(null, query.merge(hisRes, data))
+                                else
+                                    realRes = data
+                            }
+                            else {
+                                callback(err)
+                            }
+                        })
+                    this.cs.get(JSON.stringify(histor.toJSON), function (err, ca){
+                            if (ca) {
+                                debug('get result ' + ca + ' from cache for query ' + JSON.stringify(histor.toJSON()))
+                                counter += 1
+                                if(counter == 2)
+                                    callback(null, query.merge(JSON.parse(ca), realRes))
+                                else
+                                    hisRes = JSON.parse(ca)
+                            }
+                            else {
+                                self.exec(histor, function (err, data){
+                                    counter += 1
+                                    if (data) {
+                                        if(counter == 2)
+                                            callback(null, query.merge(data, realRes))
+                                        else
+                                            hisRes = data
+                                        this.cs.set(JSON.stringify(histor.toJSON()), JSON.stringify(data))
+                                        debug('set cache for query '+ JSON.stringify(histor.toJSON()))
+                                    }
+                                    else {
+                                        callback(err)
+                                    }
+                                })
+                            }
+                    })
+                }
+                else{
+                    this.cs.get(JSON.stringify(histor.toJSON), function (err, ca){
+                        if (ca) {
+                            debug('get result ' + ca + ' from cache for query ' + JSON.stringify(histor.toJSON()))
                             callback(null, JSON.parse(ca))
-                    }
-                    else {
-                        debug('no cache found for query' + JSON.stringify(histor.toJSON()))
-                        if (realtime) {
-                            self.execBatchQueries([histor, realtime], function (err, data) {
-                                if (data) {
-                                    callback(null, query.merge(data[0], data[1]))
-                                    this.cs.set(JSON.stringify(histor.toJSON()), JSON.stringify(data[0]))
-                                }
-                                else {
-                                    callback(err)
-                                }
-                            })
                         }
                         else {
-                            self.exec(histor, function (err, data) {
+                            self.exec(histor, function (err, data){
                                 if (data) {
                                     callback(null, data)
                                     this.cs.set(JSON.stringify(histor.toJSON()), JSON.stringify(data))
@@ -78,8 +98,8 @@ Client.prototype.exec =  function (query, callback, cache=false) {
                                 }
                             })
                         }
-                    }
-                })
+                    })
+                }
             }
             else{
                 this.request.post(realQuery, (err, data, body) => {
