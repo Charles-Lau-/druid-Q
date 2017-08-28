@@ -70,7 +70,7 @@ Client.prototype.exec =  function (query, callback, cache=false) {
                                             callback(null, query.merge(data, realRes))
                                         else
                                             hisRes = data
-                                        this.cs.set(JSON.stringify(histor.toJSON()), JSON.stringify(data))
+                                        self.cs.set(JSON.stringify(histor.toJSON()), JSON.stringify(data))
                                         debug('set cache for query '+ JSON.stringify(histor.toJSON()))
                                     }
                                     else {
@@ -90,7 +90,7 @@ Client.prototype.exec =  function (query, callback, cache=false) {
                             self.exec(histor, function (err, data){
                                 if (data) {
                                     callback(null, data)
-                                    this.cs.set(JSON.stringify(histor.toJSON()), JSON.stringify(data))
+                                    self.cs.set(JSON.stringify(histor.toJSON()), JSON.stringify(data))
                                     debug('set cache for query '+ JSON.stringify(histor.toJSON()))
                                 }
                                 else {
