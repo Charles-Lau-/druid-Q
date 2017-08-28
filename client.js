@@ -53,7 +53,7 @@ Client.prototype.exec =  function (query, callback, cache=false) {
                                 callback(err)
                             }
                         })
-                    this.cs.get(JSON.stringify(histor.toJSON), function (err, ca){
+                    this.cs.get(JSON.stringify(histor.toJSON()), function (err, ca){
                             if (ca) {
                                 debug('get result ' + ca + ' from cache for query ' + JSON.stringify(histor.toJSON()))
                                 counter += 1
@@ -81,7 +81,7 @@ Client.prototype.exec =  function (query, callback, cache=false) {
                     })
                 }
                 else{
-                    this.cs.get(JSON.stringify(histor.toJSON), function (err, ca){
+                    this.cs.get(JSON.stringify(histor.toJSON()), function (err, ca){
                         if (ca) {
                             debug('get result ' + ca + ' from cache for query ' + JSON.stringify(histor.toJSON()))
                             callback(null, JSON.parse(ca))
