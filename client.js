@@ -18,6 +18,10 @@ function Client(url, druid){
 }
 
 
+Client.prototype.setCacheService =  function (cache){
+    this.cs = cache
+}
+
 Client.prototype.exec =  function (query, callback, cache=false) {
     if(this.druid.ready == true) {
         var realQuery = query.toJSON()
@@ -34,7 +38,7 @@ Client.prototype.exec =  function (query, callback, cache=false) {
             let counter = 0
             let self = this
             if (histor) {
-                cache.get(JSON.stringify(histor.toJSON()), function (err, ca) {
+                this.cs.get(JSON.stringify(histor.toJSON()), function (err, ca) {
                     if (ca) {
                         debug('get result ' + ca + ' from cache for query ' + JSON.stringify(histor.toJSON()))
                         if (realtime)
@@ -55,7 +59,7 @@ Client.prototype.exec =  function (query, callback, cache=false) {
                             self.execBatchQueries([histor, realtime], function (err, data) {
                                 if (data) {
                                     callback(null, query.merge(data[0], data[1]))
-                                    cache.set(JSON.stringify(histor.toJSON()), JSON.stringify(data[0]))
+                                    this.cs.set(JSON.stringify(histor.toJSON()), JSON.stringify(data[0]))
                                 }
                                 else {
                                     callback(err)
@@ -66,7 +70,7 @@ Client.prototype.exec =  function (query, callback, cache=false) {
                             self.exec(histor, function (err, data) {
                                 if (data) {
                                     callback(null, data)
-                                    cache.set(JSON.stringify(histor.toJSON()), JSON.stringify(data))
+                                    this.cs.set(JSON.stringify(histor.toJSON()), JSON.stringify(data))
                                     debug('set cache for query '+ JSON.stringify(histor.toJSON()))
                                 }
                                 else {
